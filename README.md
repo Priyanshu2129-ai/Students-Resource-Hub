@@ -202,7 +202,7 @@ Follow these steps to run the project locally.
 ## 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/Priy anshu2129-ai/Students-Resource-Hub.git
+git clone https://github.com/Priyanshu2129-ai/Students-Resource-Hub.git
 ```
 
 ```bash
