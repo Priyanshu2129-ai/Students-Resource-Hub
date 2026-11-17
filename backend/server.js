@@ -3,6 +3,7 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const connectDB = require("./config/db");
 
@@ -24,18 +25,12 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 
-// ==========================================
-// CONNECT MONGODB
-// ==========================================
-
-connectDB();
-
-// ==========================================
-// CORS
-// ==========================================
-
 const allowedOrigins = [
   "http://localhost:5173",
+  // Production Vercel frontend (also covered by the
+  // ".vercel.app" suffix check below, listed explicitly
+  // for clarity and robustness).
+  "https://students-resource-hub.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -122,6 +117,47 @@ app.get("/api/test", (req, res) => {
     success: true,
     message: "Student Resources Hub API is working",
   });
+});
+
+// ==========================================
+// HEALTH CHECK /api/health
+// ==========================================
+//
+// Reports the real MongoDB connection state.
+// Returns 200 only when the database is connected.
+// Returns 503 when the database is unavailable.
+//
+// SAFETY:
+// - Never exposes the MONGO_URI, credentials or any
+//   environment variable.
+// - Never exposes student data.
+// - Lightweight (no DB query, just the driver state).
+//
+// ==========================================
+
+app.get("/api/health", (req, res) => {
+  // Mongoose readyState:
+  //   0 = disconnected
+  //   1 = connected
+  //   2 = connecting
+  //   3 = disconnecting
+  const dbState = mongoose.connection.readyState;
+
+  const connected = dbState === 1;
+
+  const status = connected ? 200 : 503;
+
+  const payload = {
+    ok: connected,
+    database: {
+      status: connected
+        ? "connected"
+        : "disconnected",
+    },
+    timestamp: new Date().toISOString(),
+  };
+
+  return res.status(status).json(payload);
 });
 
 app.use(
@@ -268,6 +304,18 @@ app.use(
 
 app.use(
   (req, res) => {
+    // If MongoDB is not connected, fail fast with a clear
+    // message instead of letting Mongoose buffer DB queries
+    // for 10 seconds and then timing out (which surfaced as
+    // a "Network Error" in the browser).
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message:
+          "Database connection unavailable. Please try again in a moment.",
+      });
+    }
+
     console.log(
       "================================="
     );
@@ -337,27 +385,49 @@ app.use(
 const PORT =
   process.env.PORT || 5000;
 
-app.listen(
-  PORT,
-  () => {
-    console.log(
-      "======================================"
+const startServer = async () => {
+  try {
+    // Wait for a real MongoDB connection before accepting
+    // traffic, so DB routes never run against a dead pool.
+    await connectDB();
+  } catch (error) {
+    // If the DB is unreachable at boot, log clearly and exit
+    // so Render can restart the instance. A crash here is
+    // preferable to booting with a broken DB and returning
+    // 502/503 for every request.
+    console.error(
+      "❌ Fatal: could not connect to MongoDB on startup."
     );
 
-    console.log(
-      "🚀 Student Resources Hub Backend"
-    );
+    console.error(error.message);
 
-    console.log(
-      `🚀 Running on port ${PORT}`
-    );
-
-    console.log(
-      `🚀 API: http://localhost:${PORT}/api`
-    );
-
-    console.log(
-      "======================================"
-    );
+    process.exit(1);
   }
-);
+
+  app.listen(
+    PORT,
+    () => {
+      console.log(
+        "======================================"
+      );
+
+      console.log(
+        "🚀 Student Resources Hub Backend"
+      );
+
+      console.log(
+        `🚀 Running on port ${PORT}`
+      );
+
+      console.log(
+        `🚀 API: http://localhost:${PORT}/api`
+      );
+
+      console.log(
+        "======================================"
+      );
+    }
+  );
+};
+
+startServer();
