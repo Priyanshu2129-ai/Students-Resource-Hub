@@ -13,7 +13,7 @@ It provides students with branch-wise academic resources, AI-powered study assis
 ### 🚀 Student Resources Hub
 
 **Live Website:**
-https://student-resources-hq1anqjkr-student-resource-hub1.vercel.app/login
+https://student-resources-1vnzb3d3d-student-resource-hub1.vercel.app/
 
 > The application is deployed online, so users can access it without running the project on a local computer.
 
@@ -202,11 +202,11 @@ Follow these steps to run the project locally.
 ## 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/kumarabhiraj05981-dot/student-resources-hub.git
+git clone https://github.com/Priyanshu2129-ai/Students-Resource-Hub.git
 ```
 
 ```bash
-cd student-resources-hub
+cd Students-Resource-Hub
 ```
 
 ---
@@ -489,22 +489,20 @@ This project demonstrates practical experience with:
 
 # 👨‍💻 Developer
 
-### Abhiraj Kumar
+### Priyanshu Kumar
 
-**Computer Science Engineering Student**
-Government Polytechnic Vaishali
+**Final-Year Diploma Student — Computer Science & Engineering**
 
 Interested in:
 
 * 🤖 Artificial Intelligence
-* 🧠 Machine Learning
 * 💻 Software Development
 * 🌐 Full-Stack Development
+* 🎬 Video Editing
 
 ### Connect With Me
 
-* 💼 LinkedIn: `abhiraj-kumar-2a869a3b1`
-* 🐙 GitHub: `kumarabhiraj05981-dot`
+* 🐙 GitHub: [Priyanshu2129-ai](https://github.com/Priyanshu2129-ai)
 
 ---
 
@@ -512,9 +510,9 @@ Interested in:
 
 If you find this project useful:
 
-⭐ Star the repository
-🍴 Fork the project
-🐛 Report issues
+⭐ Star the repository  
+🍴 Fork the project  
+🐛 Report issues  
 💡 Suggest improvements
 
 ---
